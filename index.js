@@ -39,7 +39,6 @@ io.on('connection', async (socket) => {
 
     socket.on("message", async (message) => {
         const { from, text } = message
-        console.log(from, text)
 
         io.sockets.emit('message', {
             text: text,
