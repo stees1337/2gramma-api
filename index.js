@@ -11,9 +11,11 @@ import { Server } from 'socket.io';
 import User from "./db/schemas/user.js";
 import mongoose from "mongoose";
 import Message from "./db/schemas/message.js";
+import config from "./data/config.js";
 
 (async () => {
     await User.deleteMany();
+    await deleteOldMessages();
 })();
 
 const app = express()
@@ -60,9 +62,9 @@ io.on('connection', async (socket) => {
 
 });
 
-server.listen(3000);
+server.listen(config.socket_port);
 
-const PORT = 1337
+const PORT = config.api_port
 
 connect()
 /* */
@@ -80,3 +82,12 @@ app.use('/api/messages', messagesRouter)
 app.listen(PORT, () => console.log(`api started on *:${PORT}`))
 
 //fiverr
+
+async function deleteOldMessages() {
+    const halfHourAgo = new Date(Date.now() - 30 * 60 * 1000);
+    await Message.deleteMany({ _id: { $lt: mongoose.Types.ObjectId.createFromTime(halfHourAgo / 1000) } })
+}
+
+setInterval(async () => {
+    await deleteOldMessages()
+}, 30 * 60 * 1000)
