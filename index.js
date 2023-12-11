@@ -32,14 +32,13 @@ io.on('connection', async (socket) => {
         name: faker.internet.userName(),
         socket_id: socket.id
     })
-    
+
     socket.emit("user", 
         user
     )
 
     socket.on("message", async (message) => {
         const { from, text } = message
-        console.log(message)
         console.log(from, text)
 
         io.sockets.emit('message', {
